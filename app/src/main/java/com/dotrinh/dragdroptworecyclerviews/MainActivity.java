@@ -18,9 +18,9 @@ public class MainActivity extends AppCompatActivity implements DragListener.List
 
     //region define
     @BindView(R.id.recyclerViewTop)
-    RecyclerView rvTop;
+    RecyclerView recyclerViewTop;
     @BindView(R.id.recyclerViewBottom)
-    RecyclerView rvBottom;
+    RecyclerView recyclerViewBottom;
     @BindView(R.id.tvEmptyListTop)
     TextView tvEmptyListTop;
     @BindView(R.id.tvEmptyListBottom)
@@ -33,51 +33,38 @@ public class MainActivity extends AppCompatActivity implements DragListener.List
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        initTopRecyclerView();
-        initBottomRecyclerView();
+        recyclerViewTop.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        List<String> topList = new ArrayList<>();
+        topList.add("A");
+        topList.add("B");
+        ListAdapter top_adapter = new ListAdapter(topList, this);
+        recyclerViewTop.setAdapter(top_adapter);
+        tvEmptyListTop.setOnDragListener(top_adapter.getDragInstance());
+        recyclerViewTop.setOnDragListener(top_adapter.getDragInstance());
+
+
+        List<String> bottomList = new ArrayList<>();
+        bottomList.add("C");
+        bottomList.add("D");
+        ListAdapter list_adapter = new ListAdapter(bottomList, this);
+        recyclerViewBottom.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerViewBottom.setAdapter(list_adapter);
+        tvEmptyListBottom.setOnDragListener(list_adapter.getDragInstance());
+        recyclerViewBottom.setOnDragListener(list_adapter.getDragInstance());
 
         tvEmptyListTop.setVisibility(View.GONE);
         tvEmptyListBottom.setVisibility(View.GONE);
     }
 
-    private void initTopRecyclerView() {
-        rvTop.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-        List<String> topList = new ArrayList<>();
-        topList.add("A");
-        topList.add("B");
-        // topList.add("B1");
-        // topList.add("B2");
-        // topList.add("B3");
-
-        ListAdapter top_adapter = new ListAdapter(topList, this);
-        rvTop.setAdapter(top_adapter);
-        tvEmptyListTop.setOnDragListener(top_adapter.getDragInstance());
-        rvTop.setOnDragListener(top_adapter.getDragInstance());
-    }
-
-    private void initBottomRecyclerView() {
-        rvBottom.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-        List<String> bottomList = new ArrayList<>();
-        bottomList.add("C");
-        bottomList.add("D");
-
-        ListAdapter list_adapter = new ListAdapter(bottomList, this);
-        rvBottom.setAdapter(list_adapter);
-        tvEmptyListBottom.setOnDragListener(list_adapter.getDragInstance());
-        rvBottom.setOnDragListener(list_adapter.getDragInstance());
-    }
-
     @Override
     public void setEmptyListTop(boolean visibility) {
         tvEmptyListTop.setVisibility(visibility ? View.VISIBLE : View.GONE);
-        rvTop.setVisibility(visibility ? View.GONE : View.VISIBLE);
+        recyclerViewTop.setVisibility(visibility ? View.GONE : View.VISIBLE);
     }
 
     @Override
     public void setEmptyListBottom(boolean visibility) {
         tvEmptyListBottom.setVisibility(visibility ? View.VISIBLE : View.GONE);
-        rvBottom.setVisibility(visibility ? View.GONE : View.VISIBLE);
+        recyclerViewBottom.setVisibility(visibility ? View.GONE : View.VISIBLE);
     }
 }
