@@ -1,17 +1,15 @@
 package com.dotrinh.dragdroptworecyclerviews;
 
-import static com.dotrinh.dragdroptworecyclerviews.LogUtil.LogI;
-
 import android.content.ClipData;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -19,7 +17,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder> implements View.OnTouchListener {
+class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder> {
 
     private List<String> list;
     private DragListener.Listener listener;
@@ -38,9 +36,7 @@ class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder> imple
     @Override
     public void onBindViewHolder(ListViewHolder holder, int position) {
         holder.text.setText(list.get(position));
-        holder.frameLayout.setTag(position);
-        holder.frameLayout.setOnTouchListener(this);
-        holder.frameLayout.setOnDragListener(new DragListener(listener));
+        holder.frameLayoutCell.setTag(position);
     }
 
 
@@ -69,29 +65,37 @@ class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder> imple
     class ListViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.text)
         TextView text;
-        @BindView(R.id.frame_layout_item)
-        FrameLayout frameLayout;
+        @BindView(R.id.frame_layout_cell)
+        FrameLayout frameLayoutCell;
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         ListViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            frameLayoutCell.setOnLongClickListener(myView -> {
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(myView);
+                myView.startDragAndDrop(data, shadowBuilder, myView, 0);
+                return true;
+            });
+            frameLayoutCell.setOnDragListener(new DragListener(listener));
         }
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        LogI("onTouch: " + v.getId());
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    v.startDragAndDrop(data, shadowBuilder, v, 0);
-                } else {
-                    v.startDrag(data, shadowBuilder, v, 0);
-                }
-                return true;
-        }
-        return false;
-    }
+    // @Override
+    // public boolean onTouch(View myView, MotionEvent event) {
+    //     LogI("onTouch: " + myView.getId());
+    //     switch (event.getAction()) {
+    //         case MotionEvent.ACTION_DOWN:
+    //             ClipData data = ClipData.newPlainText("", "");
+    //             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(myView);
+    //             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    //                 myView.startDragAndDrop(data, shadowBuilder, myView, 0);
+    //             } else {
+    //                 myView.startDrag(data, shadowBuilder, myView, 0);
+    //             }
+    //             return true;
+    //     }
+    //     return false;
+    // }
 }

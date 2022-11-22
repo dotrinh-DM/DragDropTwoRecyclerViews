@@ -1,6 +1,6 @@
 package com.dotrinh.dragdroptworecyclerviews;
 
-import static com.dotrinh.dragdroptworecyclerviews.LogUtil.LogI;
+import static com.dotrinh.dragdroptworecyclerviews.tool.LogUtil.LogI;
 
 import android.view.DragEvent;
 import android.view.View;
@@ -19,11 +19,11 @@ public class DragListener implements View.OnDragListener {
     }
 
     @Override
-    public boolean onDrag(View v, DragEvent event) {
+    public boolean onDrag(View myView, DragEvent event) {
         // LogI("event.getAction() " + event.getAction());
         switch (event.getAction()) {
             case 1: {
-                LogI("ACTION_DRAG_STARTED bat dau keo");
+                LogI("ACTION_DRAG_STARTED bat dau keo vao khu vuc view lang nghe");
                 break;
             }
             case 2: {
@@ -36,67 +36,68 @@ public class DragListener implements View.OnDragListener {
                 int positionTarget = -1;
 
                 View viewSource = (View) event.getLocalState();
-                int viewId = v.getId();
-                final int flItem = R.id.frame_layout_item;
+                int viewId = myView.getId();
+                final int frame_layout_cell = R.id.frame_layout_cell;
                 final int tvEmptyListTop = R.id.tvEmptyListTop;
                 final int tvEmptyListBottom = R.id.tvEmptyListBottom;
                 final int recyclerViewTop = R.id.recyclerViewTop;
                 final int recyclerViewBottom = R.id.recyclerViewBottom;
 
                 switch (viewId) {
-                    case flItem:
+                    case frame_layout_cell:
                     case tvEmptyListTop:
                     case tvEmptyListBottom:
                     case recyclerViewTop:
                     case recyclerViewBottom: {
+                        // Xac dinh target
                         RecyclerView target;
                         switch (viewId) {
                             case tvEmptyListTop:
                             case recyclerViewTop: {
-                                target = (RecyclerView) v.getRootView().findViewById(recyclerViewTop);
+                                target = (RecyclerView) myView.getRootView().findViewById(recyclerViewTop);
                                 break;
                             }
                             case tvEmptyListBottom:
                             case recyclerViewBottom: {
-                                target = (RecyclerView) v.getRootView().findViewById(recyclerViewBottom);
+                                target = (RecyclerView) myView.getRootView().findViewById(recyclerViewBottom);
                                 break;
                             }
                             default: {
-                                target = (RecyclerView) v.getParent();
-                                positionTarget = (int) v.getTag();
+                                target = (RecyclerView) myView.getParent();
+                                positionTarget = (int) myView.getTag();
                             }
                         }
                         if (viewSource != null) {
                             RecyclerView source = (RecyclerView) viewSource.getParent();
 
-                            ListAdapter adapterSource = (ListAdapter) source.getAdapter();
+                            //src
+                            ListAdapter adapter_source = (ListAdapter) source.getAdapter();
                             int positionSource = (int) viewSource.getTag();
                             int sourceId = source.getId();
-
-                            String list = adapterSource.getList().get(positionSource);
-                            List<String> listSource = adapterSource.getList();
-
+                            String list = adapter_source.getList().get(positionSource);
+                            List<String> listSource = adapter_source.getList();
                             listSource.remove(positionSource);
-                            adapterSource.updateList(listSource);
-                            adapterSource.notifyDataSetChanged();
+                            adapter_source.updateList(listSource);
+                            adapter_source.notifyDataSetChanged();
 
-                            ListAdapter adapterTarget = (ListAdapter) target.getAdapter();
-                            List<String> customListTarget = adapterTarget.getList();
+                            //target
+                            ListAdapter adapter_target = (ListAdapter) target.getAdapter();
+                            List<String> customListTarget = adapter_target.getList();
                             if (positionTarget >= 0) {
                                 customListTarget.add(positionTarget, list);
                             } else {
                                 customListTarget.add(list);
                             }
-                            adapterTarget.updateList(customListTarget);
-                            adapterTarget.notifyDataSetChanged();
+                            adapter_target.updateList(customListTarget);
+                            adapter_target.notifyDataSetChanged();
 
-                            if (sourceId == recyclerViewBottom && adapterSource.getItemCount() < 1) {
+                            if (sourceId == recyclerViewBottom && adapter_source.getItemCount() < 1) {
                                 listener.setEmptyListBottom(true);
                             }
                             if (viewId == tvEmptyListBottom) {
                                 listener.setEmptyListBottom(false);
                             }
-                            if (sourceId == recyclerViewTop && adapterSource.getItemCount() < 1) {
+                            if (sourceId == recyclerViewTop && adapter_source.getItemCount() < 1) {
                                 listener.setEmptyListTop(true);
                             }
                             if (viewId == tvEmptyListTop) {

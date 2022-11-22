@@ -3,7 +3,7 @@
  * Copyright (c) 2020. USE Inc. All rights reserved.
  */
 
-package com.dotrinh.dragdroptworecyclerviews;
+package com.dotrinh.dragdroptworecyclerviews.tool;
 
 import android.util.Log;
 
